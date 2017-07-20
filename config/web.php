@@ -6,6 +6,22 @@ $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+     // behavior
+    'on beforeRequest' => function ($event) {
+        $l_saved = null;
+        if (true){
+            # use cookie to store language
+            $l_saved = Yii::$app->request->cookies->get('locale');
+        }else{
+            # use session to store language
+            $l_saved = Yii::$app->session['locale'];
+        }
+        $l = ($l_saved)?$l_saved:'zh-CN';
+        echo $l;
+        Yii::$app->sourceLanguage = (string)$l;
+        Yii::$app->language = $l;
+        return; 
+    }, 
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -39,6 +55,18 @@ $config = [
 
         ],
     ],
+    // ... andere Einstellungen
+    'i18n' => [
+            'translations' => [
+            'app*' => [
+                'class' => 'yii\i18n\GettextMessageSource',
+                'basePath' => '@app/messages', // @app zeigt auf Yii2-Base
+                // 'sourceLanguage' => 'zh-CN', // Standardsprache der Strings im Projekt
+                // 'catalog' => 'zh_CN',//与@app/language/zh-CN/message.po文件名一致
+                'useMoFile' => false,
+            ],
+            ],
+        ],
     'log' => [
                 'traceLevel' => 0, //YII_DEBUG ? 3 : 0,
                 'flushInterval' => 1,   //

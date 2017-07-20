@@ -1,192 +1,149 @@
-Yii 2 Basic Project Template
-============================
-
-Yii 2 Basic Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
-rapidly creating small projects.
-
-The template contains the basic features including user login/logout and a contact page.
-It includes all commonly used configurations that would allow you to focus on adding new
-features to your application.
-
-[![Latest Stable Version](https://poser.pugx.org/yiisoft/yii2-app-basic/v/stable.png)](https://packagist.org/packages/yiisoft/yii2-app-basic)
-[![Total Downloads](https://poser.pugx.org/yiisoft/yii2-app-basic/downloads.png)](https://packagist.org/packages/yiisoft/yii2-app-basic)
-[![Build Status](https://travis-ci.org/yiisoft/yii2-app-basic.svg?branch=master)](https://travis-ci.org/yiisoft/yii2-app-basic)
-
-DIRECTORY STRUCTURE
--------------------
-
-      assets/             contains assets definition
-      commands/           contains console commands (controllers)
-      config/             contains application configurations
-      controllers/        contains Web controller classes
-      mail/               contains view files for e-mails
-      models/             contains model classes
-      runtime/            contains files generated during runtime
-      tests/              contains various tests for the basic application
-      vendor/             contains dependent 3rd-party packages
-      views/              contains view files for the Web application
-      web/                contains the entry script and Web resources
-
-
-
-REQUIREMENTS
-------------
-
-The minimum requirement by this project template that your Web server supports PHP 5.4.0.
-
-
-INSTALLATION
-------------
-
-### Install via Composer
-
-If you do not have [Composer](http://getcomposer.org/), you may install it by following the instructions
-at [getcomposer.org](http://getcomposer.org/doc/00-intro.md#installation-nix).
-
-You can then install this project template using the following command:
-
-~~~
-php composer.phar global require "fxp/composer-asset-plugin:^1.2.0"
-php composer.phar create-project --prefer-dist --stability=dev yiisoft/yii2-app-basic basic
-~~~
-
-Now you should be able to access the application through the following URL, assuming `basic` is the directory
-directly under the Web root.
-
-~~~
-http://localhost/basic/web/
-~~~
-
-
-### Install from an Archive File
-
-Extract the archive file downloaded from [yiiframework.com](http://www.yiiframework.com/download/) to
-a directory named `basic` that is directly under the Web root.
-
-Set cookie validation key in `config/web.php` file to some random secret string:
-
-```php
-'request' => [
-    // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-    'cookieValidationKey' => '<secret random string goes here>',
-],
+##支付宝微信一码多付
+PaymentqrController.php
+主要插件：
 ```
-
-You can then access the application through the following URL:
-
-~~~
-http://localhost/basic/web/
-~~~
-
-
-CONFIGURATION
--------------
-
-### Database
-
-Edit the file `config/db.php` with real data, for example:
-
-```php
-return [
-    'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
-    'username' => 'root',
-    'password' => '1234',
-    'charset' => 'utf8',
-];
+https://github.com/helei112g/payment
+composer require "riverslei/payment:~3.1"
+如果PHP版本<=5.5 
+composer require "riverslei/payment":"dev-master" --ignore-platform-reqs                              
 ```
+step1：创建一个支付宝微信二维码
 
-**NOTES:**
-- Yii won't create the database for you, this has to be done manually before you can access it.
-- Check and edit the other files in the `config/` directory to customize your application as required.
-- Refer to the README in the `tests` directory for information specific to basic application tests.
+step2：实现支付宝H5支付
+
+step3：实现微信公众号支付
 
 
+##微信扫码登录实现
 
-TESTING
--------
+WxqrloginController.php
 
-Tests are located in `tests` directory. They are developed with [Codeception PHP Testing Framework](http://codeception.com/).
-By default there are 3 test suites:
+!!注意，在微信公众号开发设置授权redirect_url。
+!!注意，在web目录下创建access_token.json文件，并赋予写入的权限。
 
-- `unit`
-- `functional`
-- `acceptance`
-
-Tests can be executed by running
+##国际化，多语言的实现
+Tran18Controller.php
+step1:config/web.php设置国际化
+```
+    // ... andere Einstellungen
+        'i18n' => [
+            'translations' => [
+            'app*' => [
+                'class' => 'yii\i18n\GettextMessageSource',
+                'basePath' => '@app/messages', // @app zeigt auf Yii2-Base
+                // 'sourceLanguage' => 'zh-CN', // Standardsprache der Strings im Projekt
+                // 'catalog' => 'zh_CN',//与@app/language/zh-CN/message.po文件名一致
+                'useMoFile' => false,
+            ],
+            ],
+        ],
+```
+step2:web.php 设置每次请求之前，先判断语言是什么语言。
+```
+$config = [
+    ······
+    'on beforeRequest' => function ($event) {
+        $l_saved = null;
+        if (true){
+            # use cookie to store language
+            $l_saved = Yii::$app->request->cookies->get('locale');
+        }else{
+            # use session to store language
+            $l_saved = Yii::$app->session['locale'];
+        }
+        $l = ($l_saved)?$l_saved:'en';
+        Yii::$app->sourceLanguage = (string)$l;
+        Yii::$app->language = $l;
+        return; 
+    }, 
+    ······
 
 ```
-composer exec codecept run
-``` 
-
-The command above will execute unit and functional tests. Unit tests are testing the system components, while functional
-tests are for testing user interaction. Acceptance tests are disabled by default as they require additional setup since
-they perform testing in real browser. 
-
-
-### Running  acceptance tests
-
-To execute acceptance tests do the following:  
-
-1. Rename `tests/acceptance.suite.yml.example` to `tests/acceptance.suite.yml` to enable suite configuration
-
-2. Replace `codeception/base` package in `composer.json` with `codeception/codeception` to install full featured
-   version of Codeception
-
-3. Update dependencies with Composer 
-
-    ```
-    composer update  
-    ```
-
-4. Download [Selenium Server](http://www.seleniumhq.org/download/) and launch it:
-
-    ```
-    java -jar ~/selenium-server-standalone-x.xx.x.jar
-    ``` 
-
-5. (Optional) Create `yii2_basic_tests` database and update it by applying migrations if you have them.
-
-   ```
-   tests/bin/yii migrate
-   ```
-
-   The database configuration can be found at `config/test_db.php`.
-
-
-6. Start web server:
-
-    ```
-    tests/bin/yii serve
-    ```
-
-7. Now you can run all available tests
-
-   ```
-   # run all available tests
-   composer exec codecept run
-
-   # run acceptance tests
-   composer exec codecept run acceptance
-
-   # run only unit and functional tests
-   composer exec codecept run unit,functional
-   ```
-
-### Code coverage support
-
-By default, code coverage is disabled in `codeception.yml` configuration file, you should uncomment needed rows to be able
-to collect code coverage. You can run your tests and collect coverage with the following command:
-
+step3:创建messages文件夹，及文件下下面的内容。本次使用的是po国家化。
+/en 
+/zh-CN
 ```
-#collect coverage for all tests
-composer exec codecept run -- --coverage-html --coverage-xml
+https://poedit.net/
+poedit编辑器进行翻译编译。
+```
+step4：
+方法实现：
+```
+    public function actionIndex()
+    {
+      return $this->render('/tran/tran', []);
+    }
 
-#collect coverage only for unit tests
-composer exec codecept run unit -- --coverage-html --coverage-xml
-
-#collect coverage for unit and functional tests
-composer exec codecept run functional,unit -- --coverage-html --coverage-xml
+    /**
+    *国际化，demo展示
+    */
+    public function actionTrandemo(){
+      // TODO: encrype AES
+      return $this->render('/tran/tran', []);
+    }
+    /**
+    * 设定语言： 1) 设置cookie，2) 跳转回原来的页面
+    * 访问网址 - http://.../tran/language?locale=zh-CN
+    * @return [type] [description]
+    */
+    public function actionLanguage(){
+        $locale = Yii::$app->request->get('locale');
+        if ($locale){
+            #use cookie to store language
+            $l_cookie = new \yii\web\Cookie(['name' => 'locale', 'value' => $locale, 'expire' => 3600*24*30,]);
+            $l_cookie->expire = time() + 3600*24*30;
+            Yii::$app->response->cookies->add($l_cookie);
+        }
+        $this->goBack(Yii::$app->request->headers['Referer']);
+    }
+//NOTE:注意web.php on beforeRequest的函数修改。
 ```
 
-You can see code coverage output under the `tests/_output` directory.
+
+###根据不同ip，对个别主页展示不同内容。
+IppageController.php
+step1:
+```
+安装插件：判断ip地理来源
+composer  require "lysenkobv/yii2-geoip"
+```
+
+step2：
+```
+代码实现，具体看IppageController.php
+  //根据ip，显示不同的页面。
+
+    public function actionIppagedemo(){
+        //展示demo.也可以直接在layout设置，以达到自己想要的效果。
+        $geoip = new \lysenkobv\GeoIP\GeoIP();
+        $ip = $geoip->ip("202.101.164.228");
+        // $ip = $geoip->ip(); // current user ip
+        $city = $ip->city; // "San Francisco"
+        $country = $ip->country; // "United States"
+        $lng = $ip->location->lng; // 37.7898
+        $lat = $ip->location->lat; // -122.3942
+        $isoCode = $ip->isoCode; // "US"
+        $cityarray=array("Shanghai","Hangzhou");
+        if ($isoCode == 'CN' && in_array($city,$cityarray) ) {
+            // echo "<h1>显示 $city 专栏</h1>";
+            // print_r("city:{$city},country:{$country},lng:{$lng},lat:{$lat},org:{$org},isoCode:{$isoCode}");
+        } else {
+                // echo "<h1>显示非上海专栏</h1>";
+        }
+        $renderPage = "/ippage/ippage.php";
+        return $this->render($renderPage,[
+            'city'=>$city
+        ]);
+    }
+    /**
+    *根据不同地理ip，展示不同的layout内容效果。
+    */
+    public function actionIplayoutdemo(){
+        $this->layout = "iplayout";
+        //展示demo.也可以直接在layout设置，以达到自己想要的效果。
+        $renderPage = "/ippage/ippage.php";
+        return $this->render($renderPage,[
+        ]);
+    }
+```
+
