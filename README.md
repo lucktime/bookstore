@@ -1,4 +1,14 @@
-##支付宝微信一码多付
+[一码多付](#oneqrPay)
+=================
+[微信扫码登录实现](#wxqrlogin)
+=================
+[国际化，多语言的实现](#tran18)
+=================
+[根据不同ip，对个别主页展示不同内容](#ippage)
+=================
+
+<span id = "oneqrPay">##支付宝微信一码多付</span>
+=================
 PaymentqrController.php
 主要插件：
 ```
@@ -14,14 +24,16 @@ step2：实现支付宝H5支付
 step3：实现微信公众号支付
 
 
-##微信扫码登录实现
 
+<span id = "wxqrlogin">##微信扫码登录实现</span>
+================
 WxqrloginController.php
 
 !!注意，在微信公众号开发设置授权redirect_url。
 !!注意，在web目录下创建access_token.json文件，并赋予写入的权限。
 
-##国际化，多语言的实现
+<span id = "tran18">##国际化，多语言的实现</span>
+=================
 Tran18Controller.php
 step1:config/web.php设置国际化
 ```
@@ -100,7 +112,9 @@ step4：
 ```
 
 
-###根据不同ip，对个别主页展示不同内容。
+
+<span id = "ippage">##根据不同ip，对个别主页展示不同内容。</span>
+=================
 IppageController.php
 step1:
 ```
